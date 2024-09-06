@@ -1,2 +1,2 @@
 MyPlayer/target/*
-MyPlayer/target/.*
+MyPlayer/target/.rustc_info.json
