@@ -1,6 +1,6 @@
 extern crate rodio;
-// https://www.rustwiki.org.cn/zh-CN/cargo/getting-started/index.html
-// https://sdk.nnsdao.com/docs/rust-guide/rust-unit-test
+//https://www.rustwiki.org.cn/zh-CN/cargo/getting-started/index.html
+//https://sdk.nnsdao.com/docs/rust-guide/rust-unit-test
 use std::fs::File;
 use std::io::BufReader;
 // use rodio::Source;
