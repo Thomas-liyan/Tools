@@ -1,1 +1,1 @@
-/Users/liyan/rustStudy/MyPlayer/target/debug/MyPlayer: /Users/liyan/rustStudy/MyPlayer/src/main.rs
+/Users/liyan/smalltools/Tools/MyPlayer/target/debug/MyPlayer: /Users/liyan/smalltools/Tools/MyPlayer/src/main.rs
