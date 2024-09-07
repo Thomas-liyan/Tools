@@ -9,14 +9,6 @@ use rodio::{Decoder, OutputStream, Sink};
 use std::error::Error;
 use std::io::{self};
 
-fn get_music_source(f: String) -> Decoder<BufReader<File>> {
-    print!("open File : {} \n", f);
-    let file = BufReader::new(File::open(f).unwrap());
-    // Decode that sound file into a source
-    // return source
-    return Decoder::new(file).unwrap();
-}
-
 fn get_files_from_pattern(pattern: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let paths = glob(pattern)?;
     let mut file_names: Vec<String> = Vec::new();
@@ -32,14 +24,15 @@ fn get_files_from_pattern(pattern: &str) -> Result<Vec<String>, Box<dyn Error>> 
 }
 
 fn add_music_list(sink: &Sink) {
+    const ABS_PATH: &str = "/Users/liyan/Music/";
     // 定义文件路径模式
-    let pattern = "/Users/liyan/Music/*.mp3";
-    let result = get_files_from_pattern(pattern);
+    let pattern = String::from(ABS_PATH) + "*.mp3";
+    let result = get_files_from_pattern(&pattern);
     if let Some(file_names) = result.ok() {
         for name in file_names {
-            let abs_name = "/Users/liyan/Music/".to_string() + &name;
+            let abs_name = ABS_PATH.to_string() + &name;
             print!("add file : {} \n", abs_name);
-            sink.append(get_music_source(abs_name));
+            sink.append(Decoder::new(BufReader::new(File::open(abs_name).unwrap())).unwrap());
         }
     }
 }
@@ -50,9 +43,9 @@ fn play_sink(sink: &Sink) {
 }
 
 fn main() {
-    println!("Hello, world!");
+    println!("Enjoy it!");
     main_loop();
-    println!("Playing audio..end");
+    println!("Playing audio...end");
 }
 
 fn main_loop() {
@@ -62,34 +55,35 @@ fn main_loop() {
         println!("->: ");
         let mut input = String::new();
         match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                if "exit" == input.trim() {
+            Ok(_) => match input.trim() {
+                "exit" => {
                     println!("exit");
                     sink.stop();
                     break;
                 }
-                if "play" == input.trim() {
+                "play" => {
                     play_sink(&sink);
                 }
-                if "pause" == input.trim() {
+                "pause" => {
                     sink.pause();
                 }
-                if "next" == input.trim() {
+                "next" => {
                     sink.skip_one();
                 }
-                if "len" == input.trim() {
+                "len" => {
                     print!("sink list len is : {} \n", sink.len());
                 }
-                if "resume" == input.trim() {
+                "resume" => {
                     sink.play();
-                } else {
+                }
+                _ => {
                     println!("你输入的是：{}", input);
                     if sink.empty() {
                         add_music_list(&sink);
                         sink.play();
                     }
                 }
-            }
+            },
             Err(error) => {
                 println!("无法读取输入：{}", error);
             }
