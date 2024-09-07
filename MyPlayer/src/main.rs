@@ -1,13 +1,15 @@
 extern crate rodio;
 //https://www.rustwiki.org.cn/zh-CN/cargo/getting-started/index.html
 //https://sdk.nnsdao.com/docs/rust-guide/rust-unit-test
+//https://practice-zh.course.rs/flow-control.html
 use std::fs::File;
 use std::io::BufReader;
 // use rodio::Source;
 use glob::glob;
+use rand::Rng;
 use rodio::{Decoder, OutputStream, Sink};
 use std::error::Error;
-use std::io::{self};
+use std::io::{self}; // 导入Rng trait，它提供了生成随机数的方法
 
 fn get_files_from_pattern(pattern: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let paths = glob(pattern)?;
@@ -37,6 +39,25 @@ fn add_music_list(sink: &Sink) {
     }
 }
 
+fn play_random(sink: &Sink) {
+    let total = sink.len();
+    // 生成一个随机数
+    let mut rng = rand::thread_rng();
+    let random_number = rng.gen_range(1..=total);
+    println!("Random number: {}", random_number);
+    for _i in 0..random_number {
+        sink.skip_one();
+    }
+    check_empty(sink);
+}
+
+fn check_empty(sink: &Sink) {
+    if sink.empty() {
+        add_music_list(&sink);
+        sink.play();
+    }
+}
+
 fn play_sink(sink: &Sink) {
     add_music_list(&sink);
     sink.play();
@@ -61,6 +82,9 @@ fn main_loop() {
                     sink.stop();
                     break;
                 }
+                "random" => {
+                    play_random(&sink);
+                }
                 "play" => {
                     play_sink(&sink);
                 }
@@ -78,10 +102,7 @@ fn main_loop() {
                 }
                 _ => {
                     println!("你输入的是：{}", input);
-                    if sink.empty() {
-                        add_music_list(&sink);
-                        sink.play();
-                    }
+                    check_empty(&sink);
                 }
             },
             Err(error) => {
@@ -93,11 +114,12 @@ fn main_loop() {
 
 #[cfg(test)]
 mod tests {
+    use rand::Rng;
     use rodio::source::Source;
     use rodio::{Decoder, OutputStream};
     use std::fs::File;
     use std::io::BufReader;
-    use std::io::{self, Write};
+    use std::io::{self, Write}; // 导入Rng trait，它提供了生成随机数的方法
 
     #[test]
     fn internal() {
@@ -144,5 +166,18 @@ mod tests {
         // The sound plays in a separate audio thread,
         // so we need to keep the main thread alive while it's playing.
         std::thread::sleep(std::time::Duration::from_secs(365));
+    }
+
+    #[test]
+    fn test_count_random() {
+        0.89.abs();
+        // 创建一个随机数生成器
+        let mut rng = rand::thread_rng();
+        // 生成1到100之间的随机整数
+        let random_number = rng.gen_range(1..=10);
+        print!("random number is : {} \n", random_number);
+        for i in 1..=random_number {
+            print!("i number is : {} \n", i)
+        }
     }
 }
